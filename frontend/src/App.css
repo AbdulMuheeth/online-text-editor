@@ -1,0 +1,22 @@
+
+.App {
+  margin: 1rem 4rem;
+}
+
+.App .quill .ql-container {
+  border-bottom-left-radius: 0.5em;
+  border-bottom-right-radius: 0.5em;
+  background: #fefcfc;
+}
+
+/* Snow Theme */
+.App .quill .ql-snow.ql-toolbar {
+  display: block;
+  background: red;
+  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
+}
+
+.App .quill .ql-editor {
+  min-height: 18em;
+}
