@@ -1,7 +1,11 @@
 import {
+  Alert,
+  AlertTitle,
   Box,
   Button,
+  Collapse,
   FormControl,
+  IconButton,
   Modal,
   TextField,
   Typography,
@@ -16,24 +20,42 @@ import {
   getJWTtoken,
 } from "../../Others/data/pathDetails";
 import GroupedTabs from "../Tabs/GroupedTabs";
-import { encrypt,decrypt,compare } from "n-krypta";
+import CryptoJS from "crypto-js";
+import { AiOutlineClose } from "react-icons/ai";
 
 const PathHome = () => {
-  const { textData, token, updateText, updateToken } =
+  const { textData, encryptedData, token, updateText, updateEncrypted, updateToken } =
     React.useContext(TextData);
   const pathName = useParams();
   const [open, setOpen] = React.useState(true);
   const [password, setPassword] = React.useState("");
   const [newPath, setPath] = React.useState(true);
+  const [incorrectPassword,setIncorrectPass] = React.useState(false);
   // const [tkn,setToken] = React.useState(token);
+
+  const decrpytContent = (txt) => {
+    
+    const bytes = CryptoJS.AES.decrypt(txt, process.env.REACT_APP_ENCRYPTION_KEY);
+    const data = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    
+    return data;
+  }
+
+  const decrpytFiles =  (files) => {
+    const decrpytedFiles = []
+    
+    files.map((file)=>{
+      decrpytedFiles.push({name:decrpytContent(file.name),text:decrpytContent(file.text)});
+    })
+    
+    return decrpytedFiles;
+  }
 
   React.useEffect(() => {
     const verifyPath = async () => {
       try {
         const ans = await isValidPathName(pathName.pathName);
-        console.log(ans);
         if (ans) {
-          console.log("inside");
           setPath(false);
         }
       } catch (error) {
@@ -41,48 +63,16 @@ const PathHome = () => {
       }
     };
 
-    // const getData = async () => {
-    //   try{
-    //     console.log("inside data fetch")
-    //     const data = await getDataFiles(pathName.pathName,token);
-    //     console.log(data);
-    //     updateText(data);
-    //     console.log("after data fetch")
-    //   }
-    //   catch(error){
-    //     alert("invalid token or pathName")
-    //   }
-    // }
-
-    // const pathToken = localStorage.getItem("pathToken");
-    // console.log(pathToken);
-    // if (pathToken === null || pathToken === "") {
-    verifyPath();
-    // }
-
-    // if(!open){
-    //   console.log("called data fetch")
-    //   console.log(token)
-    //   getData()
-    // }
-    // else{
-    //   setPath(false)
-    // }
-
-    return () => {
-      // localStorage.removeItem("pathToken");
-    };
+    verifyPath();    
   }, []);
 
   React.useEffect(() => {
     const getData = async () => {
       try {
-        console.log("inside data fetch");
         const data = await getDataFiles(pathName.pathName, token);
-        console.log("0----------00-0000000000",data);
-        const decrpytedFiles = decrypt(data.files,process.env.REACT_APP_ENCRYPTION_KEY);
+        const decrpytedFiles = decrpytFiles(data.files)
         updateText(decrpytedFiles);
-        console.log("after data fetch");
+        updateEncrypted(data.files);
       } catch (error) {
         console.log(error);
         alert("invalid token or pathName");
@@ -90,15 +80,10 @@ const PathHome = () => {
     };
 
     if (!open) {
-      console.log("called data fetch");
-      console.log(token);
       getData();
     }
   }, [open]);
 
-  const handleOpen = () => {
-    setOpen(true);
-  };
   const handleClose = () => {
     setOpen(false);
   };
@@ -111,27 +96,22 @@ const PathHome = () => {
   const generateToken = async (pathObj) => {
     try {
       const res = await getJWTtoken(pathObj);
-      console.log(res);
       if (res.status !== 404 && res.data.token !== "") {
-        console.log("not error");
         updateToken(res.data.token);
         return res.data.token;
       }
     } catch (error) {
-      console.log("----------invalid------");
-      alert("Invalid Password");
+      setIncorrectPass(true);
+      return null;
     }
   };
 
   const createNewPathVariable = async (pathObj) => {
     try {
-      console.log("------>inside----------");
-      const res = await createNewPath(pathObj);
-      console.log("------> newpath done,token Gen ----------");
+      
+      await createNewPath(pathObj);
       const resToken = await generateToken(pathObj);
-      console.log("------> token done ----------", resToken);
-      const res2 = await setNew(pathName.pathName, resToken);
-      console.log("----------", res, resToken, res2, "---------");
+      await setNew(pathName.pathName, resToken);
       handleClose();
     } catch (error) {
       alert("error while generating new path");
@@ -150,11 +130,15 @@ const PathHome = () => {
       } else {
         // generate the token the existing path // generate token for the new path
         const getToken = async () => {
-          await generateToken({
+          
+          const tkn = await generateToken({
             pathName: pathName.pathName,
             password: password,
           });
-          handleClose();
+
+          if(tkn)
+            handleClose();
+
         };
         getToken();
       }
@@ -163,10 +147,35 @@ const PathHome = () => {
 
   return (
     <>
+  
+    <div style={{display:'flex',justifyContent:'center'}}>
+      <Collapse in={incorrectPassword} >
+        <Alert
+        severity="error"
+        action={
+          <IconButton
+            aria-label="close"
+            color="inherit"
+            size="small"
+            onClick={() => {
+              setIncorrectPass(false);
+            }}
+          >
+            <AiOutlineClose fontSize="inherit" />
+          </IconButton>
+        }
+        sx={{ width:'100%',mb: 2,zIndex:1000,fontSize:'1rem' }}
+        >
+          <AlertTitle>Error</AlertTitle>
+          Incorrect Password — <strong>Please, enter correct password</strong>
+        </Alert>
+      </Collapse>
+    </div>
+
       <Modal
         open={open}
         onClose={handleClose}
-        sx={{ backgroundColor: "rgba(0, 0, 0, 0.25)", zIndex: 1 }}
+        sx={{ backgroundColor: "rgba(0, 0, 0, 0.25)", zIndex: -1 }}
         hideBackdrop={true}
       >
         <Box
@@ -175,23 +184,25 @@ const PathHome = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 500,
+            // width: 500,
+            width:{xs:'95%',md:'60%'},
+            padding:'0.5rem',
             bgcolor: "white",
-            border: "2px solid #000",
+            border: "0.5px solid grey",
             boxShadow: 24,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             flexDirection: "column",
-            p: 4,
+            borderRadius:'40px'
+            // p: 4,
           }}
         >
-          <Typography id="title" variant="h6" sx={{ marginBottom: 3 }}>
-            {newPath &&
-              "This path is empty, own the path by creating a password.\n"}
-            <br />
-            "Please remember you password, because you won't be able to reset it
-            again"
+          <Typography id="title" variant="h6" sx={{ marginBottom: 3,padding:'1rem' }}>
+            {newPath ?
+              <p>This path is empty, own the path by creating a password. <b> Please remember you password</b>, because you won't be able to reset it again</p>:
+              <p>This is path is already occupied, If this is your path <b> Please Enter The Password</b></p>
+              }
           </Typography>
           <form>
             <FormControl>
@@ -208,26 +219,13 @@ const PathHome = () => {
                 required
               />
             </FormControl>
-            {/* <br /> */}
-            {/* <FormControl>
-              <TextField
-                label="Description"
-                multiline
-                rows={3}
-                variant="outlined"
-                onChange={(e) => {
-                  setNewDescription(e.target.value);
-                }}
-                sx={{ width: 250,marginBottom:2 }}
-              />
-            </FormControl> */}
+
             <br />
 
-            <div style={{ display: "flex", justifyContent: "space-around" }}>
-              <Button type="submit" onClick={(e) => handleSubmit(e)}>
+            <div style={{ display: "flex", justifyContent: "space-around",margin:'2rem 0' }}>
+              <Button type="submit" onClick={(e) => handleSubmit(e)} sx={{fontWeight:600}} variant='outlined' color='success'>
                 Submit
               </Button>
-              {/* <Button onClick={handleClose}>cancel</Button> */}
             </div>
           </form>
         </Box>

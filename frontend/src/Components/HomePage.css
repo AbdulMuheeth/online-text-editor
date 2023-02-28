@@ -1,0 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Tilt+Prism&display=swap');
+
+#heading {
+    font-family: 'Tilt Prism', cursive;
+    /* font-size: 100%; */
+    margin: 2rem;
+    /* padding: 2rem;
+    text-align: center; */
+}

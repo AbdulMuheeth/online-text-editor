@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const dataSchema = new mongoose.Schema({
   pathName: { type: String, required: true },
-  files: { type: String }
+  files: { type: Array }
 });
 
 const Data = mongoose.model("Data", dataSchema);

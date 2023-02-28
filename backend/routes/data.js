@@ -7,9 +7,9 @@ const myFunctions = require('../others/functions')
 const dataSchema = require('../models/fileData')
 const pathSchema = require('../models/path')
 
-router.get('/',(req,res)=>{
-    res.send("data")
-})
+// router.get('/',(req,res)=>{
+//     res.send("data")
+// })
 
 router.post('/getSpecific', async (req,res)=>{
     const pathName = req.body.pathName;
@@ -18,7 +18,7 @@ router.post('/getSpecific', async (req,res)=>{
 
     if (isValid){
         dataSchema.findOne({pathName:pathName},(err,doc)=>{
-            console.log(doc);
+            // console.log(doc);
             if(doc){
                 return res.status(200).send(doc)
             }
@@ -34,17 +34,17 @@ router.post('/getSpecific', async (req,res)=>{
 
 
 router.post('/new',async (req,res)=>{
-    console.log('/new')
+    // console.log('/new')
     const pathName = req.body.pathName;
     const token = req.body.token;
     const isValid = await myFunctions.isValidToken(pathName,token);
-    const defaultData = [{name:'File - 1',text:"<h3>start Writing...</h3>"}];
+    const defaultData = [{name:'U2FsdGVkX1/1GhjpmyhkKV+G00gbDPoDcP35KObJsxc=',text:"U2FsdGVkX1+jPNFa5TQ4iG57geuE1xAlTaQzTv1wpXXwr2PpyncQ1tlFlubJ+THt"}];
     if (isValid){
         pathSchema.find({pathName:pathName},(err,docs)=>{
             if(docs.length !== 0){
                 const newDataPath = new  dataSchema({
                     pathName:pathName,
-                    files: encrypt(defaultData,process.env.ENCR_SECRET)
+                    files: defaultData
                 })
                 newDataPath.save()
                 return res.status(200).send("files added successfully");
@@ -60,15 +60,15 @@ router.post('/new',async (req,res)=>{
 })
 
 router.put("/updateFiles",async (req,res)=>{
-    console.log("/updateFiles")
+    // console.log("/updateFiles")
     const pathName = req.body.pathName;
     const token = req.body.token;
     const files = req.body.files;
-    console.log(req.body,files);
+    // console.log(req.body,files);
     const isValid = await myFunctions.isValidToken(pathName,token);
     if (isValid){
         dataSchema.updateOne({pathName:pathName},{files:files},(err,doc)=>{
-            console.log("response, ",doc);
+            // console.log("response, ",doc);
             if(doc.acknowledged){
                 res.status(200).send(true);
             }

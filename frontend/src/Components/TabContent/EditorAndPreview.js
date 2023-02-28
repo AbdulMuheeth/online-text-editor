@@ -1,16 +1,15 @@
 import { Button, Grid, TextField,FormControl } from '@mui/material';
-import { Box } from '@mui/system';
 import React from 'react'
-import { TextData } from '../../App';
+import { TbChevronsDown } from "react-icons/tb";
+
+
 import Editor from '../Editor';
 
 const EditorAndPreview = ({content,idx,handleSave,handleRemove}) => {
 
-    const {textData,token,updateText,updateToken} = React.useContext(TextData);
+    // const {textData, encryptedData, token, updateText, updateEncrypted, updateToken} = React.useContext(TextData);
 
     const [preview,setPreview] = React.useState(true);
-    // const [fileName,setFileName]
-    // console.log(textData.demo1[0]);
     const [value,setValue] = React.useState(content.text);
     const [fileName,setFileName] = React.useState(content.name);
 
@@ -26,16 +25,23 @@ const EditorAndPreview = ({content,idx,handleSave,handleRemove}) => {
 
     return (
         <div>
-            
+            <br/>
             {
             preview?
                 <div>
-                    <Grid container justifyContent={'space-around'}>
-                        <Button onClick={handlePreviewClose} variant="outlined">Edit</Button>
-                        <Button onClick={()=>handleRemove(idx)} variant="outlined" color='error'>Delete</Button>
+                    <Grid container justifyContent={'center'} alignItems={'center'} spacing={2} sx={{marginBottom:'1rem'}}>
+                            <Grid item  xs={12} md={6} sx={{justifyContent:'center',display:'flex'}}>
+                                <h3 style={{}}> Showing Preview <TbChevronsDown style={{fontWeight:"900"}}/></h3>
+                            </Grid>
+                            <Grid item xs={6} md={3}  sx={{justifyContent:'center',display:'flex'}}>
+                                <Button onClick={handlePreviewClose} sx={{fontWeight:600 }} variant="outlined">Edit</Button>
+                            </Grid>
+                            <Grid item xs={6} md={3}  sx={{justifyContent:'center',display:'flex'}}>
+                                <Button onClick={()=>handleRemove(idx)} variant="outlined" sx={{fontWeight:600}} color='error'>Delete</Button>
+                            </Grid>
                     </Grid>
+                    <br/>
                     <div  dangerouslySetInnerHTML={{ __html: value }}/>
-                    {/* {textData[0].demo1.text} */}
                 </div>:
                 <div>
                     
@@ -45,28 +51,27 @@ const EditorAndPreview = ({content,idx,handleSave,handleRemove}) => {
                                     <TextField
                                         id="outlined-basic"
                                         label="File Name"
-                                        
                                         variant="outlined"
-                                        // error={!newName}
                                         value={fileName}
                                         onChange={(e) => {
                                             setFileName(e.target.value)
                                         }}
-                                        sx={{ width: 300,marginBottom: 2 }}
+                                        sx={{
+                                            width: { xs:300, sm: 500, md: 400 }
+                                        }}
                                         fullWidth
                                         required
-
                                         />
                                 </FormControl>
                             </Grid>
                             <Grid item xs={6} md={3}  sx={{justifyContent:'center',display:'flex'}}>
-                                <Button onClick={handleSaveAndOpenPreview} variant='outlined'>Save & See Preview</Button>
+                                <Button onClick={handleSaveAndOpenPreview} variant='outlined' sx={{minHeight:'4rem'}}>Save & See Preview</Button>
                             </Grid>
                             <Grid item xs={6} md={3}  sx={{justifyContent:'center',display:'flex'}}>
-                                <Button onClick={()=>handleRemove(idx)} variant='outlined' color='error' sx={{width:'8rem'}}>Delete</Button>
+                                <Button onClick={()=>handleRemove(idx)} variant='outlined' color='error' sx={{width:'8rem', minHeight:'4rem'}}>Delete</Button>
                             </Grid>
                         </Grid>
-                        
+                        <br/>
                     <Editor value={value} handleValueChange={setValue} />
                 </div>
             }
