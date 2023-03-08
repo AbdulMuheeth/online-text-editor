@@ -10,15 +10,6 @@ TextData.displayName = "TextFiles";
 
 function App() {
 
-  // const getTextFiles = () => {
-    
-  //   if(localStorage.getItem("text") === null){
-  //     localStorage.setItem("text",JSON.stringify(demoTextFiles));
-  //   }
-  //   const text = JSON.parse(localStorage.getItem("text"));
-  //   return text;
-  // }
-  
   const [textData,setTextData] = React.useState([])
   const [encryptedData,setEncryptedData] = React.useState([])
   const [token,setToken] = React.useState("")
