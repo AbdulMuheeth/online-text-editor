@@ -13,9 +13,11 @@ const HomePage = () => {
   return (
     <div>
         <div style={{display:'flex',justifyContent:'center'}}>
-            <Typography variant='h1' sx={{}} id="heading">
+        <img src="/bpr.png" height="300"/>
+            {/* <Typography variant='h1' sx={{}} id="heading">
                 Secure Text
             </Typography>
+             */}
         </div>
 
         <div style={{display:'flex',justifyContent:'center'}}>
@@ -61,7 +63,7 @@ const HomePage = () => {
         <div style={{display:'flex',flexDirection:'column',justifyContent:'center',textAlign:'center'}}>
             <br/><br/>
             <Typography variant='h5' sx={{}}>
-                Enter any Path, e.g. localhost:3000/ANYTHING. Isn't occupied, then it's yours.
+                Enter any Path, e.g. secure-text.netlify.app/ANYTHING. Isn't occupied, then it's yours.
             </Typography>
             <br/>
             
@@ -69,7 +71,7 @@ const HomePage = () => {
             
                <b> Get started,</b> &ensp;
             
-                Go to localhost:3000/ <TextField label="Path Name" value={path} onChange={(e)=>setPath(e.target.value)} sx={{minHeight:'3rem'}}/> &ensp; <Button variant='outlined' onClick={()=>{navigate(`/${path}`)}} sx={{minHeight:'3rem'}} > GO! </Button>
+                Go to secure-text.netlify.app/ <TextField label="Path Name" value={path} onChange={(e)=>setPath(e.target.value)} sx={{minHeight:'3rem'}}/> &ensp; <Button variant='outlined' onClick={()=>{navigate(`/${path}`)}} sx={{minHeight:'3rem'}} > GO! </Button>
             </Typography>
         </div>
     </div>
